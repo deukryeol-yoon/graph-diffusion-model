@@ -1,12 +1,3 @@
-from torch_geometric.utils import to_dense_adj
-import torch.nn as nn 
-from torch_geometric.utils import to_networkx
-import matplotlib.pyplot as plt
-from torch_geometric.datasets import QM7b
-from torch_geometric.datasets import QM9
-from torch_geometric.datasets import ZINC
-from torch_geometric.datasets import TUDataset
-
 from GAE_data import get_dataset, GraphDataset
 from GAE_model import GraphVAE, GraphEncoder, GraphDecoder
 
@@ -14,9 +5,15 @@ import argparse
 
 import torch
 import torch.optim as optim
+import torch.nn as nn 
 import torch.nn.functional as F
 from torch.optim.lr_scheduler import MultiStepLR
-
+from torch_geometric.utils import to_dense_adj
+from torch_geometric.utils import to_networkx
+from torch_geometric.datasets import QM7b
+from torch_geometric.datasets import QM9
+from torch_geometric.datasets import ZINC
+from torch_geometric.datasets import TUDataset
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
