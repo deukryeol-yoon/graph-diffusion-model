@@ -4,7 +4,7 @@ import torch.nn.init as init
 
 import scipy.optimize
 
-import GAE_util
+import GAE_util as util
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
