@@ -6,8 +6,8 @@ import torch
 def get_dataset(dataset="grid"):
     if dataset == "grid":
         graphs = []
-        for i in range(2, 10):
-            for j in range(2, 10):
+        for i in range(2, 5):
+            for j in range(2, 5):
                 graphs.append(nx.grid_2d_graph(i, j))
 
         return graphs
