@@ -1,3 +1,12 @@
+from torch_geometric.utils import to_dense_adj
+import torch.nn as nn 
+from torch_geometric.utils import to_networkx
+import matplotlib.pyplot as plt
+from torch_geometric.datasets import QM7b
+from torch_geometric.datasets import QM9
+from torch_geometric.datasets import ZINC
+from torch_geometric.datasets import TUDataset
+
 from GAE_data import get_dataset, GraphDataset
 from GAE_model import GraphVAE, GraphEncoder, GraphDecoder
 
@@ -12,6 +21,10 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
+real_graphs = []
+for graphset in [QM7b(root = './dataset'),TUDataset(name = 'MUTAG', root = './dataset'), QM9(root = './dataset'),ZINC(root = './dataset')]:
+  for real_graph in graphset:
+    real_graphs.append(to_networkx(real_graph))
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 LR_milestones = [500, 1000]
@@ -104,8 +117,8 @@ def generate(model):
 def main():
 
     args = arg_parse()
-    graphs = get_dataset(dataset="grid")
-
+    #graphs = get_dataset(dataset="grid")   ### Synthetic Graph
+    graphs = real_graphs
     if args.max_num_nodes == -1:
         args.max_num_nodes = max(
             [graphs[i].number_of_nodes() for i in range(len(graphs))]
