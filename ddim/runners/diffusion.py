@@ -103,7 +103,7 @@ class Diffusion(object):
             dataset,
             batch_size=config.training.batch_size,
             shuffle=True,
-            num_workers=config.data.num_workers,
+            #num_workers=config.data.num_workers,
         )
         model = Model(config)
 
@@ -133,7 +133,8 @@ class Diffusion(object):
         for epoch in range(start_epoch, self.config.training.n_epochs):
             data_start = time.time()
             data_time = 0
-            for i, (x, y) in enumerate(train_loader):
+            #for i, (x, y) in enumerate(train_loader):
+            for i, x in enumerate(train_loader):
                 n = x.size(0)
                 data_time += time.time() - data_start
                 model.train()
@@ -243,10 +244,10 @@ class Diffusion(object):
 
     def sample_fid(self, model):
         config = self.config
-        img_id = len(glob.glob(f"{self.args.image_folder}/*"))
-        print(f"starting from image {img_id}")
+        xid = len(glob.glob(f"{self.args.image_folder}/*"))
+        print(f"starting from image {xid}")
         total_n_samples = 50000
-        n_rounds = (total_n_samples - img_id) // config.sampling.batch_size
+        n_rounds = (total_n_samples - xid) // config.sampling.batch_size
 
         with torch.no_grad():
             for _ in tqdm.tqdm(
@@ -265,10 +266,8 @@ class Diffusion(object):
                 x = inverse_data_transform(config, x)
 
                 for i in range(n):
-                    tvu.save_image(
-                        x[i], os.path.join(self.args.image_folder, f"{img_id}.png")
-                    )
-                    img_id += 1
+                    np.save(os.path.join(self.args.image_folder, f"{xid}"), torch.flatten(x[i]).numpy())
+                    xid += 1
 
     def sample_sequence(self, model):
         config = self.config
