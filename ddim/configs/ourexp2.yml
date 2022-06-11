@@ -1,7 +1,8 @@
 data:
     dataset: "QM7b"
     root_dir: "./dataset"
-    model_path: "./savedAE/graph_embeddings_QM7b.pkl"
+    embedding_path: "./savedAE/graph_embeddings_QM7b.pkl"
+    model_path: "./savedAE/model_QM7b.pkl"
     direct_embedding_flag: True
     image_size: 16
     channels: 1

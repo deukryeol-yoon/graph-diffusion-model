@@ -23,7 +23,7 @@ from torch_geometric.datasets import TUDataset
 # Our DataSet ----------------------------------------------------------------------------------
 class GraphEmbeddings(Dataset):
 
-    def __init__(self, name, root_dir, model_path, image_size=16, features="id", transform=None, device=None, direct_embedding_flag=False):
+    def __init__(self, name, root_dir, model_path, embedding_path, image_size=16, features="id", transform=None, device=None, direct_embedding_flag=False):
         self.root_dir = root_dir
         self.device = device
         self.name = name
@@ -31,7 +31,7 @@ class GraphEmbeddings(Dataset):
         self.direct_embedding = direct_embedding_flag
         if self.direct_embedding:
             graphs = None
-            with open(model_path, 'rb') as f:
+            with open(embedding_path, 'rb') as f:
                 self.embeddings = pickle.load(f)
             for emb in self.embeddings:
                 emb.requires_grad = False
@@ -127,7 +127,7 @@ def get_dataset(args, config):
     # Call our dataset ---------------------------------------------------------------------------------------
     if config.data.dataset in ["QM7b", "MUTAG", "QM9", "ZINC"]:
         # name, root_dir, model_path, image_size=
-        dataset = GraphEmbeddings(name=config.data.dataset, root_dir=config.data.root_dir, model_path=config.data.model_path, image_size=config.data.image_size, device=config.device, direct_embedding_flag=config.data.direct_embedding_flag)
+        dataset = GraphEmbeddings(name=config.data.dataset, root_dir=config.data.root_dir, model_path=config.data.model_path, embedding_path=cofig.data.embedding_path, image_size=config.data.image_size, device=config.device, direct_embedding_flag=config.data.direct_embedding_flag)
         # test_dataset = GraphEmbeddings(name=config.data.dataset, root_dir=config.data.root_dir, model_path=config.data.model_path, image_size=config.data.image_size, train=False, device=config.device)
         test_dataset = None
     # ---------------------------------------------------------------------------------------------------------
