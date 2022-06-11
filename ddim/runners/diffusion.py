@@ -15,6 +15,7 @@ from functions.losses import loss_registry
 from datasets import get_dataset, data_transform, inverse_data_transform
 from functions.ckpt_util import get_ckpt_path
 from GAE_model import GraphVAE, GraphEncoder, GraphDecoder
+import GAE_util as util
 import pickle
 
 import torchvision.utils as tvu
@@ -247,7 +248,7 @@ class Diffusion(object):
         model.eval()
 
         if self.args.fid:
-            self.sample_fid(model, ae_model)
+            self.sample_fid(model, ae_model, self.config.data.max_num_nodes)
         elif self.args.interpolation:
             self.sample_interpolation(model)
         elif self.args.sequence:
@@ -255,7 +256,7 @@ class Diffusion(object):
         else:
             raise NotImplementedError("Sample procedeure not defined")
 
-    def sample_fid(self, model, ae_model):
+    def sample_fid(self, model, ae_model, max_num_nodes):
         config = self.config
         xid = len(glob.glob(f"{self.args.image_folder}/*"))
         print(f"starting from image {xid}")
@@ -279,13 +280,17 @@ class Diffusion(object):
                 x = inverse_data_transform(config, x)
                 
                 # AutoEncoder Decoder
-                # print("Before: ", x.shape)
+                print("Before: ", x.shape)
                 x = x.view(x.shape[0], -1)
                 x = ae_model.decoder(x.to(self.device))
-                # print("After: ", x.shape)
+                print("After: ", x.shape)
 
                 for i in range(n):
-                    np.save(os.path.join(self.args.image_folder, f"{xid}"), x[i].detach().cpu().numpy())
+                    recon_adj_lower = util.recover_adj_lower(x[i].cpu().data, max_num_nodes)
+                    recon_adj_tensor = util.recover_full_adj_from_lower(recon_adj_lower)
+                    if i == 0:
+                        print("Adj: ", recon_adj_tensor.shape)
+                    np.save(os.path.join(self.args.image_folder, f"{xid}"), recon_adj_tensor.numpy())
                     xid += 1
 
     def sample_sequence(self, model):

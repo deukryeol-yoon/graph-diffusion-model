@@ -3,6 +3,7 @@ data:
     root_dir: "./dataset"
     embedding_path: "./savedAE/graph_embeddings_QM7b.pkl"
     model_path: "./savedAE/model_QM7b.pkl"
+    max_num_nodes: 23
     direct_embedding_flag: True
     image_size: 16
     channels: 1
