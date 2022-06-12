@@ -20,8 +20,8 @@ import numpy as np
 
 real_graphs = []
 for graphset in [QM7b(root = './dataset'),TUDataset(name = 'MUTAG', root = './dataset'), QM9(root = './dataset'),ZINC(root = './dataset')]:
-  for real_graph in graphset:
-    real_graphs.append(to_networkx(real_graph))
+    for real_graph in graphset:
+        real_graphs.append(to_networkx(real_graph))
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 LR_milestones = [500, 1000]

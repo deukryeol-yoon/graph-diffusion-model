@@ -127,7 +127,7 @@ def get_dataset(args, config):
     # Call our dataset ---------------------------------------------------------------------------------------
     if config.data.dataset in ["QM7b", "MUTAG", "QM9", "ZINC"]:
         # name, root_dir, model_path, image_size=
-        dataset = GraphEmbeddings(name=config.data.dataset, root_dir=config.data.root_dir, model_path=config.data.model_path, embedding_path=cofig.data.embedding_path, image_size=config.data.image_size, device=config.device, direct_embedding_flag=config.data.direct_embedding_flag)
+        dataset = GraphEmbeddings(name=config.data.dataset, root_dir=config.data.root_dir, model_path=config.data.model_path, embedding_path=config.data.embedding_path, image_size=config.data.image_size, device=config.device, direct_embedding_flag=config.data.direct_embedding_flag)
         # test_dataset = GraphEmbeddings(name=config.data.dataset, root_dir=config.data.root_dir, model_path=config.data.model_path, image_size=config.data.image_size, train=False, device=config.device)
         test_dataset = None
     # ---------------------------------------------------------------------------------------------------------

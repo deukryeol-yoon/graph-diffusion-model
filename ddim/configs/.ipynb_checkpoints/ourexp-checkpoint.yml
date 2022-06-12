@@ -1,7 +1,7 @@
 data:
     dataset: "QM7b"
     root_dir: "./dataset"
-    model_path: ".pt"
+    model_path: "./savedAE/model_QM7b.pkl"
     image_size: 16
     channels: 1
     logit_transform: false

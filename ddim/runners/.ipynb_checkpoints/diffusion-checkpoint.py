@@ -14,6 +14,9 @@ from functions import get_optimizer
 from functions.losses import loss_registry
 from datasets import get_dataset, data_transform, inverse_data_transform
 from functions.ckpt_util import get_ckpt_path
+from GAE_model import GraphVAE, GraphEncoder, GraphDecoder
+import GAE_util as util
+import pickle
 
 import torchvision.utils as tvu
 
@@ -103,7 +106,7 @@ class Diffusion(object):
             dataset,
             batch_size=config.training.batch_size,
             shuffle=True,
-            num_workers=config.data.num_workers,
+            #num_workers=config.data.num_workers,
         )
         model = Model(config)
 
@@ -133,7 +136,8 @@ class Diffusion(object):
         for epoch in range(start_epoch, self.config.training.n_epochs):
             data_start = time.time()
             data_time = 0
-            for i, (x, y) in enumerate(train_loader):
+            #for i, (x, y) in enumerate(train_loader):
+            for i, x in enumerate(train_loader):
                 n = x.size(0)
                 data_time += time.time() - data_start
                 model.train()
@@ -191,6 +195,17 @@ class Diffusion(object):
 
     def sample(self):
         model = Model(self.config)
+        
+        # encoder = GraphEncoder(256, 64, 256).to(self.device)
+        # decoder = GraphDecoder(256, 64, 23).to(self.device)
+        # ae_model = GraphVAE(encoder, decoder, 256, 23).to(self.device)
+        with open(self.config.data.model_path, 'rb') as f:
+            obj = f.read()
+        ae_model = pickle.loads(obj, encoding='latin1').to(self.device)
+        # print(loaded)
+        # weights = {key: torch.from_numpy(arr) for key, arr in loaded.items()}
+        # ae_model.load_state_dict(weights)
+        # ae_model = torch.load(self.config.data.model_path).to(self.device)
 
         if not self.args.use_pretrained:
             if getattr(self.config.sampling, "ckpt_id", None) is None:
@@ -233,7 +248,7 @@ class Diffusion(object):
         model.eval()
 
         if self.args.fid:
-            self.sample_fid(model)
+            self.sample_fid(model, ae_model, self.config.data.max_num_nodes)
         elif self.args.interpolation:
             self.sample_interpolation(model)
         elif self.args.sequence:
@@ -241,12 +256,12 @@ class Diffusion(object):
         else:
             raise NotImplementedError("Sample procedeure not defined")
 
-    def sample_fid(self, model):
+    def sample_fid(self, model, ae_model, max_num_nodes):
         config = self.config
-        img_id = len(glob.glob(f"{self.args.image_folder}/*"))
-        print(f"starting from image {img_id}")
+        xid = len(glob.glob(f"{self.args.image_folder}/*"))
+        print(f"starting from image {xid}")
         total_n_samples = 50000
-        n_rounds = (total_n_samples - img_id) // config.sampling.batch_size
+        n_rounds = (total_n_samples - xid) // config.sampling.batch_size
 
         with torch.no_grad():
             for _ in tqdm.tqdm(
@@ -263,12 +278,20 @@ class Diffusion(object):
 
                 x = self.sample_image(x, model)
                 x = inverse_data_transform(config, x)
+                
+                # AutoEncoder Decoder
+                print("Before: ", x.shape)
+                x = x.view(x.shape[0], -1)
+                x = ae_model.decoder(x.to(self.device))
+                print("After: ", x.shape)
 
                 for i in range(n):
-                    tvu.save_image(
-                        x[i], os.path.join(self.args.image_folder, f"{img_id}.png")
-                    )
-                    img_id += 1
+                    recon_adj_lower = util.recover_adj_lower(x[i].cpu().data, max_num_nodes)
+                    recon_adj_tensor = util.recover_full_adj_from_lower(recon_adj_lower)
+                    if i == 0:
+                        print("Adj: ", recon_adj_tensor.shape)
+                    np.save(os.path.join(self.args.image_folder, f"{xid}"), recon_adj_tensor.numpy())
+                    xid += 1
 
     def sample_sequence(self, model):
         config = self.config

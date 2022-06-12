@@ -1,7 +1,10 @@
 data:
-    dataset: "QM7b"
+    dataset: "MUTAG"
     root_dir: "./dataset"
-    model_path: "./savedAE/model_QM7b.pkl"
+    embedding_path: "./savedAE/graph_embeddings_MUTAG.pkl"
+    model_path: "./savedAE/model_MUTAG.pkl"
+    max_num_nodes: 28
+    direct_embedding_flag: True
     image_size: 16
     channels: 1
     logit_transform: false
