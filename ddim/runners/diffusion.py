@@ -199,9 +199,12 @@ class Diffusion(object):
         # encoder = GraphEncoder(256, 64, 256).to(self.device)
         # decoder = GraphDecoder(256, 64, 23).to(self.device)
         # ae_model = GraphVAE(encoder, decoder, 256, 23).to(self.device)
-        with open(self.config.data.model_path, 'rb') as f:
-            obj = f.read()
-        ae_model = pickle.loads(obj, encoding='latin1').to(self.device)
+        if self.config.data.model_path.endswith('pkl'):
+            with open(self.config.data.model_path, 'rb') as f:
+                obj = f.read()
+            ae_model = pickle.loads(obj, encoding='latin1').to(self.device)
+        else:
+            ae_model = torch.load(self.config.data.model_path).to(self.device)
         # print(loaded)
         # weights = {key: torch.from_numpy(arr) for key, arr in loaded.items()}
         # ae_model.load_state_dict(weights)
