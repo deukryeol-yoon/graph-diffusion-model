@@ -33,10 +33,14 @@ class GraphEmbeddings(Dataset):
             graphs = None
             with open(embedding_path, 'rb') as f:
                 self.embeddings = pickle.load(f)
-            for emb in self.embeddings:
-                emb.requires_grad = False
-            self.embeddings = torch.stack(self.embeddings)
-            self.embeddings = self.embeddings.squeeze(1)
+            if torch.is_tensor(self.embeddings) is False:
+                for emb in self.embeddings:
+                    emb.requires_grad = False
+                self.embeddings = torch.stack(self.embeddings)
+            else:
+                self.embeddings = self.embeddings.detach()
+            if len(self.embeddings.shape) == 3:
+                self.embeddings = self.embeddings.squeeze(1)
             print(self.embeddings.shape)
             # self.embeddings = torch.load(model_path)
             # print("embedding shape: ", self.embeddings.shape)
