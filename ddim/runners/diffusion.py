@@ -263,7 +263,7 @@ class Diffusion(object):
         config = self.config
         xid = len(glob.glob(f"{self.args.image_folder}/*"))
         print(f"starting from image {xid}")
-        total_n_samples = 50000
+        total_n_samples = 1000 #50000
         n_rounds = (total_n_samples - xid) // config.sampling.batch_size
 
         with torch.no_grad():
