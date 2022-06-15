@@ -43,7 +43,6 @@ training:
 
 sampling:
     batch_size: 64
-    ckpt_id: 460000
     last_only: True
 
 optim:
